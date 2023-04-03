@@ -1,7 +1,7 @@
 package com.itwill.my_real_korea.service.freeboard;
 
 import com.itwill.my_real_korea.dto.freeboard.FreeBoard;
-import com.itwill.my_real_korea.dto.freeboard.FreeBoardListPageMakerDto;
+import com.itwill.my_real_korea.util.PageMakerDto;
 
 public interface FreeBoardService {
     int insertBoard(FreeBoard freeBoard) throws Exception;
@@ -21,15 +21,15 @@ public interface FreeBoardService {
     int selectSearchCount(String keyword) throws Exception;
 
     //최신순 정렬
-    FreeBoardListPageMakerDto selectAllOrderByFBoNoDesc(int currentPage) throws Exception;
+    PageMakerDto selectAllOrderByFBoNoDesc(int currentPage) throws Exception;
 
-    FreeBoardListPageMakerDto selectAllOrderByFBoNoAsc(int currentPage) throws Exception;
+    PageMakerDto selectAllOrderByFBoNoAsc(int currentPage) throws Exception;
 
     //조회수 내림차순 정렬
-    FreeBoardListPageMakerDto selectAllOrderByReadCountDesc(int currentPage) throws Exception;
+    PageMakerDto selectAllOrderByReadCountDesc(int currentPage) throws Exception;
 
     //title 키워드로 검색
-    FreeBoardListPageMakerDto selectSearchFreeBoardList(int currentPage, String keyword) throws Exception;
+    PageMakerDto selectSearchFreeBoardList(int currentPage, String keyword) throws Exception;
 
     String getTitleString(FreeBoard freeBoard) throws Exception;
 

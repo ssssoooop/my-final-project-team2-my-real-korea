@@ -2,8 +2,8 @@ package com.itwill.my_real_korea.service.freeboard;
 
 import com.itwill.my_real_korea.dao.freeboard.FreeBoardDao;
 import com.itwill.my_real_korea.dto.freeboard.FreeBoard;
-import com.itwill.my_real_korea.dto.freeboard.FreeBoardListPageMakerDto;
 import com.itwill.my_real_korea.util.PageMaker;
+import com.itwill.my_real_korea.util.PageMakerDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,14 +54,14 @@ public class FreeBoardServiceImpl implements FreeBoardService {
     }
 
     @Override
-    public FreeBoardListPageMakerDto selectAllOrderByFBoNoDesc(int currentPage) throws Exception {
+    public PageMakerDto<FreeBoard> selectAllOrderByFBoNoDesc(int currentPage) throws Exception {
         int totalRecordCount = freeBoardDao.selectFreeBoardCount();
 
         PageMaker pageMaker = new PageMaker(totalRecordCount, currentPage);
 
         List<FreeBoard> freeBoardList = freeBoardDao.selectAllOrderByFBoNoDesc(pageMaker.getPageBegin(), pageMaker.getPageEnd());
 
-        FreeBoardListPageMakerDto pageMakerBoardList = new FreeBoardListPageMakerDto();
+        PageMakerDto<FreeBoard> pageMakerBoardList = new PageMakerDto<FreeBoard>();
 
         pageMakerBoardList.setItemList(freeBoardList);
         pageMakerBoardList.setPageMaker(pageMaker);
@@ -69,14 +69,14 @@ public class FreeBoardServiceImpl implements FreeBoardService {
     }
 
     @Override
-    public FreeBoardListPageMakerDto selectAllOrderByFBoNoAsc(int currentPage) throws Exception {
+    public PageMakerDto<FreeBoard> selectAllOrderByFBoNoAsc(int currentPage) throws Exception {
         int totalRecordCount = freeBoardDao.selectFreeBoardCount();
 
         PageMaker pageMaker = new PageMaker(totalRecordCount, currentPage);
 
         List<FreeBoard> freeBoardList = freeBoardDao.selectAllOrderByFBoNoAsc(pageMaker.getPageBegin(), pageMaker.getPageEnd());
 
-        FreeBoardListPageMakerDto pageMakerBoardList = new FreeBoardListPageMakerDto();
+        PageMakerDto<FreeBoard> pageMakerBoardList = new PageMakerDto<FreeBoard>();
 
         pageMakerBoardList.setItemList(freeBoardList);
         pageMakerBoardList.setPageMaker(pageMaker);
@@ -84,13 +84,13 @@ public class FreeBoardServiceImpl implements FreeBoardService {
     }
 
     @Override
-    public FreeBoardListPageMakerDto selectAllOrderByReadCountDesc(int currentPage) throws Exception {
+    public PageMakerDto<FreeBoard> selectAllOrderByReadCountDesc(int currentPage) throws Exception {
         int totalRecordCount = freeBoardDao.selectFreeBoardCount();
 
         PageMaker pageMaker = new PageMaker(totalRecordCount, currentPage);
 
         List<FreeBoard> freeBoardList = freeBoardDao.selectAllOrderByReadCountDesc(pageMaker.getPageBegin(), pageMaker.getPageEnd());
-        FreeBoardListPageMakerDto pageMakerBoardList = new FreeBoardListPageMakerDto();
+        PageMakerDto<FreeBoard> pageMakerBoardList = new PageMakerDto<FreeBoard>();
         pageMakerBoardList.setItemList(freeBoardList);
         pageMakerBoardList.setPageMaker(pageMaker);
         return pageMakerBoardList;
@@ -109,13 +109,13 @@ public class FreeBoardServiceImpl implements FreeBoardService {
     }
 
     @Override
-    public FreeBoardListPageMakerDto selectSearchFreeBoardList(int currentPage, String keyword) throws Exception {
+    public PageMakerDto<FreeBoard> selectSearchFreeBoardList(int currentPage, String keyword) throws Exception {
         int totalRecordCount = freeBoardDao.selectSearchCount(keyword);
         // paging 계산 (PageMaker)
         PageMaker pageMaker = new PageMaker(totalRecordCount, currentPage);
         // 게시글 데이터 얻기
         List<FreeBoard> freeboardList = freeBoardDao.selectSearchFreeBoardList(pageMaker.getPageBegin(), pageMaker.getPageEnd(), keyword);
-        FreeBoardListPageMakerDto pageMakerBoardList = new FreeBoardListPageMakerDto();
+        PageMakerDto<FreeBoard> pageMakerBoardList = new PageMakerDto<FreeBoard>();
         pageMakerBoardList.setItemList(freeboardList);
         pageMakerBoardList.setPageMaker(pageMaker);
         return pageMakerBoardList;
