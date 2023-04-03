@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.my_real_korea.mapper.TripBoardCommentMapper">
+
+<!--  동행게시판 댓글 추가 -->
+<insert id="insertTripBoardComment" parameterType="com.itwill.my_real_korea.dto.tripboard.TripBoardComment" >
+	<selectKey resultType="java.lang.Integer" keyProperty="tCoNo" order="BEFORE">
+		select trip_board_comment_t_co_no_seq.nextval from dual
+	</selectKey>
+	insert into trip_board_comment(t_co_no, t_comment_content, t_comment_date, t_bo_no, user_id) 
+                values(#{tCoNo}, #{tCommentContent}, #{tCommentDate}, #{tBoNo}, #{userId})
+</insert>
+
+<!--  동행게시판 댓글 수정 -->
+<update id="updateTripBoardComment" parameterType="com.itwill.my_real_korea.dto.tripboard.TripBoardComment">
+	update trip_board_comment set t_comment_content=#{tCommentContent} where t_co_no=#{tCoNo}
+</update>
+
+<!--  동행게시판 댓글 삭제 -->
+<delete id="deleteTripBoardComment" parameterType="java.lang.Integer">
+	delete trip_board_comment where t_co_no=#{tCoNo}
+</delete>
+
+<!--  댓글 번호로 댓글 1개 보기  -->
+<select id="selectByNo" parameterType="java.lang.Integer" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoardComment">
+	select t_co_no, t_comment_content, t_comment_date, t_bo_no, user_id from trip_board_comment where t_co_no=#{tCoNo}
+</select>
+
+<!--  동행게시판 댓글 전체 보기 -->
+<select id="selectAll" parameterType="java.util.Map" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoardComment">
+	select * from trip_board_comment
+</select>
+
+<!-- 댓글 총 개수 -->
+<select id="selectAllCount" parameterType="String" resultType="java.lang.Integer">
+	select count(*) cnt from trip_board_comment
+</select>
+</mapper>

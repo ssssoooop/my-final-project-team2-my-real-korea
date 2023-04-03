@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.my_real_korea.mapper.TripBoardMapper">
+
+<!--  동행게시판 게시글 추가 -->
+<insert id="insertTripBoard" parameterType="com.itwill.my_real_korea.dto.tripboard.TripBoard" >
+	<selectKey resultType="java.lang.Integer" keyProperty="tBoNo" order="BEFORE">
+		select trip_board_t_bo_no_seq.nextval from dual
+	</selectKey>
+	insert into trip_board(t_bo_no,t_bo_title,t_bo_content,t_bo_date,t_bo_readcount,t_bo_status,t_bo_person,
+                    t_bo_img,t_bo_start_date,t_bo_end_date,t_bo_style,hashtag,city_no,user_id) 
+            values (#{tBoNo},#{tBoTitle},#{tBoContent},sysdate,#{tBoReadcount},#{tBoStatus},#{tBoPerson},
+                    #{tBoImg},#{tBoStartDate},#{tBoEndDate},#{tBoStyle},#{hashtag},#{city.cityNo},#{userId})
+</insert>
+
+<!--  동행게시판 게시글 수정 -->
+<update id="updateTripBoard" parameterType="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	update trip_board set t_bo_title=#{tBoTitle},t_bo_content=#{tBoContent},t_bo_person=#{tBoPerson},
+                        	t_bo_img=#{tBoImg},t_bo_start_date=#{tBoStartDate},t_bo_end_date=#{tBoEndDate},
+                        	t_bo_style=#{tBoStyle},hashtag=#{hashtag},city_no=#{city.cityNo} where t_bo_no=#{tBoNo}
+</update>
+
+<!--  동행게시판 게시글 삭제 -->
+<delete id="deleteTripBoard" parameterType="java.lang.Integer">
+	delete trip_board where t_bo_no=#{tBoNo}
+</delete>
+
+<!--  게시글 번호로 게시글 1개 보기  -->
+<select id="selectByTbNo" parameterType="java.lang.Integer" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	select * from trip_board where t_bo_no=#{tBoNo}
+</select>
+
+<!--  게시글 모집상태별로 보기  -->
+<select id="selectByTbStatusList" parameterType="map" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	select * from trip_board where t_bo_status=#{tBoStatus}
+</select>
+
+<!--  게시글 지역별로 보기  -->
+<select id="selectByCityNoList" parameterType="map" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	select * from trip_board where city_no=#{city.cityNo}
+</select>
+
+<!--  게시글 해시태그별로 보기  -->
+<select id="selectByHashtagList" parameterType="map" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	select * from trip_board where hashtag=#{hashtag}
+</select>
+
+<!--  게시판 리스트 정렬(게시글 작성 날짜 기준 내림차순)  -->
+<select id="selectAllOrderByDate" parameterType="map" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	select * from trip_board order by t_bo_date desc
+</select>
+
+
+<!--  게시판 리스트 정렬(조회수 기준 내림차순)  -->
+<select id="selectAllOrderByReadCount" parameterType="map" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	select * from trip_board order by t_bo_readcount desc
+</select>
+
+<!--  동행게시판 리스트 -->
+<select id="selectAllTb" parameterType="java.util.Map" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	select * from trip_board
+</select>
+
+<!-- 게시글 총 개수 -->
+<select id="selectAllTbCount" parameterType="String" resultType="java.lang.Integer">
+	select count(*) from trip_board
+</select>
+
+<!-- 모집상태별 게시글 개수 -->
+<select id="selectStatusCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+	select count(*) from trip_board where t_bo_status=#{tBoStatus}
+</select>
+
+<!-- 지역별 게시글 개수 -->
+<select id="selectCityNoCount" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+	select count(*) from trip_board where city_no=#{city.cityNo}
+</select>
+
+<!-- 해시태그별 게시글 개수 -->
+<select id="selectHashtagCount" parameterType="String" resultType="java.lang.Integer">
+	select count(*) from trip_board where hashtag=#{hashtag}
+</select>
+
+<!--  동행게시판 게시글 조회수 1 증가 -->
+<update id="increaseTbReadCount" parameterType="java.lang.Integer">
+	update trip_board set t_bo_readcount=t_bo_readcount+1 where t_bo_no=#{tBoNo}
+</update>
+
+<!--  키워드로 검색된 동행게시판 리스트 -->
+<select id="selectSearchTbList" parameterType="map" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	select * from trip_board where t_bo_title like '%'||#{keyword}||'%'
+</select>
+
+<!--  검색된 게시글 총 개수 -->
+<select id="selectTbSearchCount" parameterType="String" resultType="java.lang.Integer">
+	select count(*) cnt from trip_board where t_bo_title like '%'||#{keyword}||'%'
+</select>
+
+<!-- 게시글 1개 조회 + City 정보 -->
+<resultMap id="CitywithTripBoardResultMap" type="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	<association property="city" javaType="com.itwill.my_real_korea.dto.City" autoMapping="true">
+	</association>
+</resultMap>
+<select id="selectCityInfo" parameterType="java.lang.Integer" resultMap="CitywithTripBoardResultMap">
+	select t.*,c.* from trip_board t join city c on t.city_no =c.city_no where t.t_bo_no = #{tBoNo}
+</select>
+
+<!-- 게시글리스트 조회 + City 정보 -->
+<select id="selectAllByCityNo" parameterType="map" resultType="com.itwill.my_real_korea.dto.tripboard.TripBoard">
+	select t.*,c.* from trip_board t join city c on t.city_no = c.city_no
+</select>
+</mapper>

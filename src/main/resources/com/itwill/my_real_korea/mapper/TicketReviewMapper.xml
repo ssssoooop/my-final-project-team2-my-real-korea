@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.my_real_korea.mapper.TicketReviewMapper">
+
+    <!--티켓 리뷰 작성 -->
+    <insert id="insertTicketReview" parameterType="com.itwill.my_real_korea.dto.ticket.TicketReview">
+        <selectKey resultType="java.lang.Integer" keyProperty="tiReviewNo" order="BEFORE">
+            SELECT TICKET_REVIEW_TI_REVIEW_NO_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+            INSERT INTO TICKET_REVIEW (TI_REVIEW_NO,TI_REVIEW_DATE,TI_REVIEW_TITLE,TI_REVIEW_CONTENT,TI_REVIEW_IMG,TI_NO,USER_ID)
+            VALUES (#{tiReviewNo}, SYSDATE,#{tiReviewTitle},#{tiReviewContent},#{tiReviewImg},#{tiNo},#{userId})
+    </insert>
+
+    <!--리뷰 보기 -->
+    <select id="selectByTicketReview" parameterType="java.lang.Integer" resultType="com.itwill.my_real_korea.dto.ticket.TicketReview">
+            SELECT * FROM TICKET_REVIEW WHERE TI_REVIEW_NO=#{tiReviewNo}
+    </select>
+    <!--내 리뷰 보기-->
+    <select id="selectByTicketReviewUser" parameterType="java.lang.String" resultType="com.itwill.my_real_korea.dto.ticket.TicketReview">
+            SELECT * FROM TICKET_REVIEW WHERE USER_ID=#{userId}
+    </select>
+
+    <!--리뷰 수정-->
+    <update id="updateTicketReview" parameterType="com.itwill.my_real_korea.dto.ticket.TicketReview">
+            UPDATE TICKET_REVIEW SET TI_REVIEW_TITLE=#{tiReviewTitle},
+                                     TI_REVIEW_CONTENT=#{tiReviewContent},
+                                     TI_REVIEW_IMG=#{tiReviewImg}
+            WHERE TI_REVIEW_NO=#{tiReviewNo}
+    </update>
+
+    <!--리뷰 삭제-->
+    <delete id="deleteTicketReview" parameterType="com.itwill.my_real_korea.dto.ticket.TicketReview">
+            DELETE FROM TICKET_REVIEW WHERE TI_REVIEW_NO = #{tiReviewNo}
+    </delete>
+
+</mapper>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.my_real_korea.mapper.UserAddInfoMapper">
+
+	<!-- 1. 회원 추가 정보 등록 -->
+	<insert id="createUserAddInfo" parameterType="com.itwill.my_real_korea.dto.user.UserAddInfo">
+		INSERT into user_add_info(introduce, alcohol, smoking, user_id) 
+		VALUES (#{introduce}, #{alcohol}, #{smoking}, #{userId})
+	</insert>
+	<!-- 2. 회원 추가 정보 보기 -->
+	<select id="findUserAddInfo" parameterType="java.lang.String" resultType="com.itwill.my_real_korea.dto.user.UserAddInfo">
+		SELECT *
+		FROM user_add_info
+		WHERE user_id = #{userId}
+	</select>
+	<!-- 3. 회원 추가 정보 수정 -->
+	<update id="updateUserAddInfo" parameterType="com.itwill.my_real_korea.dto.user.UserAddInfo">
+		UPDATE  user_add_info 
+		SET introduce = #{introduce}, alcohol = #{alcohol}, smoking = #{smoking}
+		WHERE user_id = #{userId}
+	</update>
+	<!-- 4. 회원 추가 정보 삭제 -->
+	<delete id="removeUserAddInfo" parameterType="java.lang.String">
+		DELETE user_add_info 
+		WHERE user_id = #{userId}
+	</delete>
+
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.my_real_korea.mapper.TourImgMapper">
+	<!-- 1. 투어이미지 추가 -->
+	<insert id="insertTourImg" parameterType="com.itwill.my_real_korea.dto.tour.TourImg">
+		<selectKey resultType="java.lang.Integer" keyProperty="toImgNo" order="BEFORE">
+			select tour_img_to_img_no_seq.nextval from dual
+		</selectKey>
+		insert into tour_img(to_img_no,to_img_url,to_no)
+		values(#{toImgNo},#{toImgUrl},#{toNo})
+	</insert>
+	<!-- 2. 투어이미지번호로 투어 이미지 하나 삭제 -->
+	<delete id="deleteTourImg" parameterType="java.lang.Integer">
+		delete from tour_img where to_img_no=#{toImgNo}
+	</delete>
+	<!-- 3. 투어번호로 투어이미지 전체 출력 -->
+	<select id="findTourImgList" parameterType="java.lang.Integer" resultType="com.itwill.my_real_korea.dto.tour.TourImg">
+		select * from tour_img where to_no=#{toNo}
+	</select>
+	<!-- 4. 투어번호로 해당 투어번호 이미지 전체 삭제-->
+	<delete id="deleteTourAllImg" parameterType="java.lang.Integer">
+		delete from tour_img where to_no=#{toNo}
+	</delete>
+</mapper>

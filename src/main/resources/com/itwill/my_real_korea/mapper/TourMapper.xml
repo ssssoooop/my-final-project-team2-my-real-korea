@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.my_real_korea.mapper.TourMapper">
+	<resultMap id="TourWithCityMap" type="com.itwill.my_real_korea.dto.tour.Tour" autoMapping="true">
+		<association property="city" javaType="com.itwill.my_real_korea.dto.City" autoMapping="true">
+		</association>
+	</resultMap>
+	<resultMap id="TourWithCityWithTourImgMap" type="com.itwill.my_real_korea.dto.tour.Tour" extends="TourWithCityMap" autoMapping="true">
+		<collection property="tourImgList" javaType="java.util.List" ofType="com.itwill.my_real_korea.dto.tour.TourImg" autoMapping="true">
+		</collection>
+	</resultMap>
+
+	<!-- 1. 투어상품 추가 -->
+	<insert id="insertTour" parameterType="com.itwill.my_real_korea.dto.tour.Tour">
+		<selectKey resultType="java.lang.Integer" keyProperty="toNo" order="BEFORE">
+			select tour_to_no_seq.nextval from dual
+		</selectKey>
+		insert into tour(to_no,to_name,to_type,to_time,to_person,to_meet,to_price,to_info,to_notice,to_count,city_no)
+		values(#{toNo},#{toName},#{toType},#{toTime},#{toPerson},#{toMeet},#{toPrice},#{toInfo},#{toNotice},#{toCount},#{city.cityNo})
+	</insert>
+	<!-- 2. 투어상품 수정 -->
+	<update id="updateTour" parameterType="com.itwill.my_real_korea.dto.tour.Tour">
+		update tour set to_name=#{toName},to_type=#{toType},to_time=#{toTime},to_person=#{toPerson},to_meet=#{toMeet},to_price=#{toPrice},to_info=#{toInfo},to_notice=#{toNotice} where to_no=#{toNo}
+	</update>
+	<!--                               Select                            -->
+	<!-- 3. 투어상품 전체리스트  -->
+	<select id="findTourWithTourImgWithCityAll" parameterType="java.util.Map" resultMap="TourWithCityWithTourImgMap">
+		select *
+		from (select rownum idx, tourAll.*
+			  from (select t.to_no,t.to_name,t.to_type,t.to_Time,t.to_price,
+			   			   c.city_name,
+			   			   ti.to_img_url
+			   		from tour t 
+						 join city c
+				   			on t.city_no=c.city_no
+						 left outer join tour_img ti
+				   			on t.to_no=ti.to_no
+		   				<if test="sortOrder != null">
+							<choose>
+								<when test="sortOrder == 'DESC'">
+									ORDER BY T.to_no DESC
+								</when>
+								<otherwise>
+									ORDER BY T.to_no ASC
+								</otherwise>
+							</choose>
+						</if>
+					) tourAll
+				)
+		<![CDATA[WHERE IDX >= #{pageStart} AND IDX <=#{pageEnd}]]>
+	</select>
+<!--
+	<select id="findTourWithTourImgWithCityAll" resultMap="TourWithCityWithTourImgMap">
+		select t.to_no,t.to_name,t.to_type,t.to_Time,t.to_price,
+			   c.city_name,
+			   ti.to_img_url
+		from tour t 
+		join city c
+		   on t.city_no=c.city_no
+		left outer join tour_img ti
+		   on t.to_no=ti.to_no
+		order by t.to_no asc
+	</select>
+-->
+	<!-- 4. 투어상품 상세보기 -->
+	<select id="findTourWithCityByToNo" parameterType="java.lang.Integer"
+			resultMap="TourWithCityMap">
+		select t.*,c.*
+		from tour t
+		join city c
+		on t.city_no=c.city_no
+		where t.to_no=#{to_no}
+		order by t.to_no asc
+	</select>
+	<!-- 5. 키워드로 검색 한 투어상품리스트 -->
+	<select id="findTourListByKeyword" parameterType="java.lang.String" resultMap="TourWithCityWithTourImgMap">
+		select t.to_no,t.to_name,t.to_type,t.to_Time,t.to_price,
+			   c.city_name,
+			   ti.to_img_url
+		from tour t 
+		left outer join tour_img ti 
+		   on t.to_no=ti.to_no 
+		join city c
+		   on t.city_no=c.city_no
+		where to_name like '%'||#{keyword}||'%'
+		order by t.to_no asc
+	</select>
+	<!-- 6. 지역으로 투어상품 검색 -->
+	<select id="findTourListByCityNo" parameterType="java.lang.Integer" resultMap="TourWithCityWithTourImgMap">
+		select t.to_no,t.to_name,t.to_type,t.to_Time,t.to_price,
+			   c.city_name,
+			   ti.to_img_url
+		from tour t 
+		left outer join tour_img ti 
+		   on t.to_no=ti.to_no 
+		join city c
+		   on t.city_no=c.city_no
+		where c.city_no=#{city.cityNo}
+		order by t.to_no asc 
+	</select>
+	<!-- 7. 여행타입으로 투어상품 검색 -->
+	<select id="findTourListByToType" parameterType="java.lang.Integer" resultMap="TourWithCityWithTourImgMap">
+		select t.to_no,t.to_name,t.to_type,t.to_Time,t.to_price,
+			   c.city_name,
+			   ti.to_img_url
+		from tour t 
+		left outer join tour_img ti 
+		   on t.to_no=ti.to_no 
+		join city c
+		   on t.city_no=c.city_no
+		where t.to_type=#{toType}
+		order by t.to_no asc
+	</select>
+	<!-- 8. 투어상품 삭제 -->
+	<delete id="deleteTour" parameterType="java.lang.Integer">
+		delete from tour where to_no=#{toNo}
+	</delete>
+	<!-- 9. 상품 총 개수 -->
+	<select id="findTourCount" resultType="java.lang.Integer">
+		select count(*) cnt from tour
+	</select>
+
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.my_real_korea.mapper.UserMapper">
+
+	<resultMap id="userResultMap" type="com.itwill.my_real_korea.dto.user.User" autoMapping="true">
+		<association property="userAddInfo" column="user_add_info" autoMapping="true"></association>
+		<association property="userImg" column="user_img" autoMapping="true"></association>
+	</resultMap>
+	
+	<!-- 1. 회원 가입 -->
+	<insert id="create" parameterType="com.itwill.my_real_korea.dto.user.User">
+		INSERT into user_info(user_id, password, name, nickname, phone, email, birth, address, gender, point, is_admin, mail_auth, mail_key) 
+		VALUES(#{userId},#{password},#{name},#{nickname},#{phone},#{email},#{birth},#{address},#{gender},#{point},#{isAdmin},#{mailAuth},#{mailKey})
+	</insert>
+	<!-- 2. 회원 정보 보기 -->
+	<select id="findUser" parameterType="java.lang.String" resultMap="userResultMap">
+		SELECT * 
+		FROM user_info u 
+			JOIN user_add_info ua
+				ON u.user_id = ua.user_id
+			JOIN user_img ui
+				ON u.user_id = ui.user_id
+		WHERE u.user_id = #{userId}
+	</select>
+	<!-- 3. 전체 회원 정보 보기 -->
+	<select id="findUserList" parameterType="java.lang.String" resultMap="userResultMap">
+        SELECT *
+        FROM user_info u
+			JOIN user_add_info ua
+				ON u.user_id = ua.user_id
+			JOIN user_img ui
+				ON u.user_id = ui.user_id
+	</select>
+	<!-- 4. 회원 정보 수정 -->	
+	<update id="update" parameterType="com.itwill.my_real_korea.dto.user.User">
+		UPDATE  user_info 
+		SET password = #{password}, nickname = #{nickname}, phone = #{phone}, email = #{email}
+		WHERE user_id = #{userId}
+	</update>
+	<!-- 5. 회원 탈퇴 -->
+	<delete id="remove" parameterType="java.lang.String">
+		DELETE user_info 
+		WHERE user_id = #{userId}
+	</delete>
+	
+	<!-- 11. 회원 존재 여부 확인 -->
+	<select id="isExistUser" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT count(*) 
+		FROM user_info 
+		WHERE user_id = #{userId}
+	</select>
+	<!-- 12. 비밀번호 일치 여부 확인 -->
+	<select id="isMatchPassword" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT count(*) 
+		FROM user_info 
+		WHERE user_id = #{userId} AND password = #{password}
+	</select>
+	<!-- 13. 이메일, 이름으로 아이디 찾기 -->
+	<select id="findIdByEmailName" parameterType="com.itwill.my_real_korea.dto.user.User" resultType="java.lang.String">
+		SELECT RPAD(substr(user_id, 1, 3), lengthb(user_id), '*') 
+		FROM user_info 
+		WHERE email = #{email} AND name = #{name}
+	</select>
+	
+	<!-- 21. 메일 인증여부 확인 -->
+	<select id="mailAuth" parameterType="java.lang.String" resultType="java.lang.Integer">
+		SELECT count(*)
+		FROM user_info
+		WHERE user_id = #{userId} AND mail_auth = 1
+	</select>
+	<!-- 22. 메일 인증번호 업데이트 -->
+	<update id="mailKeyUpdate" parameterType="com.itwill.my_real_korea.dto.user.User">
+		UPDATE  user_info 
+		SET mail_key = #{mailKey}
+		WHERE user_id = #{userId} AND email = #{email}
+	</update>
+	<!-- 23. 메일 인증여부 업데이트 -->
+	<update id="mailAuthUpdate" parameterType="com.itwill.my_real_korea.dto.user.User">
+		UPDATE  user_info 
+		SET mail_auth = 1
+		WHERE email = #{email} AND mail_key = #{mailKey}
+	</update>
+	
+</mapper>

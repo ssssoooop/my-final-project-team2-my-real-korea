@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+        namespace="com.itwill.my_real_korea.mapper.FreeBoardCommentMapper">
+
+
+
+<insert id="insertComment" parameterType="com.itwill.my_real_korea.dto.freeboard.FreeBoardComment">
+<!--<selectKey resultType="java.lang.Integer"-->
+<!--           keyProperty="fCommentNo" order="BEFORE">-->
+<!--    SELECT free_board_f_bo_no_seq.nextval FROM DUAL-->
+<!--</selectKey>-->
+insert into FREE_BOARD_COMMENT (f_co_no,f_comment_content,f_comment_date,f_bo_no,user_id)
+values( #{fCommentNo},#{fCommentContent},sysdate,#{fBoNo},#{userId})
+
+</insert>
+
+
+       <select id="selectAll" parameterType="java.util.Map" resultType="com.itwill.my_real_korea.dto.freeboard.FreeBoardComment">
+              select * from free_board_comment order by f_co_no asc
+
+       </select>
+
+       <delete id="deleteComment" parameterType="java.lang.Integer">
+              delete from free_board_comment where f_co_no = #{fCommentNo}
+
+       </delete>
+
+
+       <update id="updateComment" parameterType="com.itwill.my_real_korea.dto.freeboard.FreeBoardComment">
+              update FREE_BOARD_COMMENT
+              set f_comment_content=#{fCommentContent},
+                  f_comment_date=sysdate,
+                  f_bo_no=#{fBoNo},
+                  user_id=#{userId}
+              where f_co_no = #{fCommentNo}
+       </update>
+
+       <select id="selectCommentCount" resultType="java.lang.Integer">
+              select count(*) cnt from free_board_comment where f_bo_no = #{fBoNo}
+       </select>
+
+</mapper>

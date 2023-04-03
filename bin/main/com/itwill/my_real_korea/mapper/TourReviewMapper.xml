@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itwill.my_real_korea.mapper.TourReviewMapper">
+	<!-- 1. 투어상품 후기 추가 -->
+	<insert id="insertTourReview" parameterType="com.itwill.my_real_korea.dto.tour.TourReview">
+		<selectKey resultType="java.lang.Integer" keyProperty="toReviewNo" order="BEFORE">
+			select tour_review_to_review_no_seq.nextval from dual
+		</selectKey>
+		insert into tour_review(to_review_no,to_review_date,to_review_title,to_review_content,to_review_img,to_review_star,to_no,user_id)
+		values(#{toReviewNo},sysdate,#{toReviewTitle},#{toReviewContent},#{toReviewImg},#{toReviewStar},#{toNo},#{userId})
+	</insert>
+	<!-- 2. 투어상품번호로 후기 전체보기 -->
+	<select id="selectByToNo" parameterType="java.util.Map" resultType="com.itwill.my_real_korea.dto.tour.TourReview">
+		select * from tour_review where to_no=#{toNo}
+	</select>
+	<!-- 3. 투어후기 수정 -->
+	<update id="updateTourReview" parameterType="com.itwill.my_real_korea.dto.tour.TourReview">
+		update tour_review set to_review_title=#{toReviewTitle}, to_review_content=#{toReviewContent}, to_review_img=#{toReviewImg}, to_review_star=#{toReviewStar} where to_review_no=#{toReviewNo}
+	</update>
+	<!-- 4. 투어후기번호로 후기 삭제 -->
+	<delete id="deleteTourReview">
+		delete from tour_review where to_review_no=#{toReviewNo}
+	</delete>
+	<!-- 5. 사용자가 작성한 후기 전체보기 -->
+	<select id="selectByUserId" parameterType="java.util.Map" resultType="com.itwill.my_real_korea.dto.tour.TourReview">
+		select * from tour_review where user_id=#{userId}
+	</select>
+	<!-- 6. 투어상품번호로 찾은 투어 후기 갯수-->
+	<select id="findCountByToNo" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+		select count(*) cnt from tour_review where to_no=#{toNo}
+	</select>
+	<!-- 7. 사용자가 작성한 후기 갯수 -->
+	<select id="findCountByUserId" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select count(*) cnt from tour_review where user_id=#{userId} 
+	</select>
+</mapper>
