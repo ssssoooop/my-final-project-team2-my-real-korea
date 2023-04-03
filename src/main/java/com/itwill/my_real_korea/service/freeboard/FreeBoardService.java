@@ -21,15 +21,15 @@ public interface FreeBoardService {
     int selectSearchCount(String keyword) throws Exception;
 
     //최신순 정렬
-    PageMakerDto selectAllOrderByFBoNoDesc(int currentPage) throws Exception;
+    PageMakerDto<FreeBoard> selectAllOrderByFBoNoDesc(int currentPage) throws Exception;
 
-    PageMakerDto selectAllOrderByFBoNoAsc(int currentPage) throws Exception;
+    PageMakerDto<FreeBoard> selectAllOrderByFBoNoAsc(int currentPage) throws Exception;
 
     //조회수 내림차순 정렬
-    PageMakerDto selectAllOrderByReadCountDesc(int currentPage) throws Exception;
+    PageMakerDto<FreeBoard> selectAllOrderByReadCountDesc(int currentPage) throws Exception;
 
     //title 키워드로 검색
-    PageMakerDto selectSearchFreeBoardList(int currentPage, String keyword) throws Exception;
+    PageMakerDto<FreeBoard> selectSearchFreeBoardList(int currentPage, String keyword) throws Exception;
 
     String getTitleString(FreeBoard freeBoard) throws Exception;
 

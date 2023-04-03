@@ -2,7 +2,7 @@ package com.itwill.my_real_korea.service.freeboard;
 
 import com.itwill.my_real_korea.dto.City;
 import com.itwill.my_real_korea.dto.freeboard.FreeBoard;
-import com.itwill.my_real_korea.dto.freeboard.FreeBoardListPageMakerDto;
+import com.itwill.my_real_korea.util.PageMakerDto;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mybatis.spring.annotation.MapperScan;
@@ -85,27 +85,27 @@ class FreeBoardServiceImplTest {
 
     @Test
     void selectSearchFreeBoardList() throws Exception {
-        FreeBoardListPageMakerDto freeBoardListPageMakerDto =
+        PageMakerDto<FreeBoard> freeBoardPageMakerDto =
                 freeBoardService.selectSearchFreeBoardList(1, "맛집");
-        System.out.println("freeBoardListPageMakerDto = " + freeBoardListPageMakerDto);
+        System.out.println("PageMakerDto = " + freeBoardPageMakerDto);
     }
     @Disabled
     @Test
     void selectAllOrderByFBoNoDesc() throws Exception {
-        FreeBoardListPageMakerDto freeBoardListPageMakerDto = freeBoardService.selectAllOrderByFBoNoDesc(1);
+        PageMakerDto<FreeBoard> freeBoardListPageMakerDto = freeBoardService.selectAllOrderByFBoNoDesc(1);
         System.out.println("freeBoardListPageMakerDto = " + freeBoardListPageMakerDto);
     }
     @Disabled
     @Test
     void selectAllOrderByFBoNoAsc() throws Exception {
-        FreeBoardListPageMakerDto freeBoardListPageMakerDto = freeBoardService.selectAllOrderByFBoNoAsc(1);
+       PageMakerDto<FreeBoard> freeBoardListPageMakerDto = freeBoardService.selectAllOrderByFBoNoAsc(1);
         System.out.println("freeBoardListPageMakerDto = " + freeBoardListPageMakerDto);
     }
 
     @Disabled
     @Test
     void selectAllOrderByReadCountDesc() throws Exception {
-        FreeBoardListPageMakerDto freeBoardListPageMakerDto = freeBoardService.selectAllOrderByReadCountDesc(1);
+        PageMakerDto<FreeBoard> freeBoardListPageMakerDto = freeBoardService.selectAllOrderByReadCountDesc(1);
         System.out.println("freeBoardListPageMakerDto = " + freeBoardListPageMakerDto);
     }
 
