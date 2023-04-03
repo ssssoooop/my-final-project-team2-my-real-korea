@@ -1,7 +1,6 @@
 package com.itwill.my_real_korea.service.freeboard;
 
 import com.itwill.my_real_korea.dao.freeboard.FreeBoardCommentDao;
-import com.itwill.my_real_korea.dto.freeboard.FreeBoard;
 import com.itwill.my_real_korea.dto.freeboard.FreeBoardComment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
