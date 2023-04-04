@@ -1,12 +1,8 @@
 package com.itwill.my_real_korea.service.user;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
-import javax.mail.MessagingException;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.itwill.my_real_korea.dao.user.UserDao;
@@ -38,12 +34,8 @@ public class UserServiceImpl implements UserService{
 		userDao.create(user);
 		//mail_key 업데이트
 		userDao.mailKeyUpdate(user);
-		
-//		emailService.sendEmail(user.getEmail());
-//		System.out.println("UserService 이메일 전송");
 		return 1;
 	}
-	
 	
 	//2. 회원 정보 보기 (마이 페이지)
 	@Override
@@ -84,16 +76,16 @@ public class UserServiceImpl implements UserService{
 	//12. 로그인 (비밀번호 일치 여부 확인)
 	//1: 로그인 성공
 	@Override
-	public int login(String userId, String password) throws Exception, UserNotFoundException, PasswordMismatchException {
-		User user = userDao.findUser(userId);
-		if (user == null) {
-			throw new UserNotFoundException(userId + " 는 존재하지 않는 아이디입니다.");
-		}
-		boolean isMatchPassword = userDao.isMatchPassword(userId,password);
-		if (!isMatchPassword) {
-			throw new PasswordMismatchException("패스워드가 일치하지 않습니다.");
-		}
-		return 1;
+	public User login(String userId, String password) throws Exception, UserNotFoundException, PasswordMismatchException {
+	    User user = userDao.findUser(userId);
+	    if (user == null) {
+	        throw new UserNotFoundException(userId + " 는 존재하지 않는 아이디입니다.");
+	    }
+	    boolean isMatchPassword = userDao.isMatchPassword(userId,password);
+	    if (!isMatchPassword) {
+	        throw new PasswordMismatchException("패스워드가 일치하지 않습니다.");
+	    }
+	    return user;
 	}
 	
 	//13. 이메일, 이름으로 아이디 찾기

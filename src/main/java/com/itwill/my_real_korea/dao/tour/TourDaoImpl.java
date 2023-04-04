@@ -44,14 +44,11 @@ public class TourDaoImpl implements TourDao{
 	}
 
 	@Override
-	public List<Tour> findTourWithTourImgWithCityAll(int pageStart, int pageEnd,String keyword, int cityNo, int toType, String sortOrder) throws Exception {
+	public List<Tour> findTourWithTourImgWithCityAll(int pageStart, int pageEnd, String sortOrder) throws Exception {
 		// 투어상품 리스트 전체 출력 + 정렬 + 페이징
 		Map<String, Object> tourPageMap=new HashMap<>();
 		tourPageMap.put("pageStart",pageStart);
 		tourPageMap.put("pageEnd",pageEnd);
-		tourPageMap.put("keyword",keyword);
-		tourPageMap.put("cityNo",cityNo);
-		tourPageMap.put("toType",toType);
 		tourPageMap.put("sortOrder", sortOrder);
 		return tourMapper.findTourWithTourImgWithCityAll(tourPageMap);
 	}

@@ -47,12 +47,12 @@ public class TourServiceImpl implements TourService {
 	}
 
 	@Override
-	public PageMakerDto<Tour> findAll(int currentPage,String keyword, int cityNo, int toType, String sortOrder) throws Exception {
+	public PageMakerDto<Tour> findAll(int currentPage, String sortOrder) throws Exception {
 		// 투어 전체 리스트 보기 + 정렬 + 페이징
 		int totTourCount=tourDao.findTourCount();	//전체 글 
 		PageMaker pageMaker= new PageMaker(totTourCount,currentPage);	//page 계산 (PageMaker)
 		//게시글 데이터 얻기
-		List<Tour> tourList=tourDao.findTourWithTourImgWithCityAll(pageMaker.getPageBegin(), pageMaker.getPageEnd(), keyword, cityNo, toType, sortOrder);
+		List<Tour> tourList=tourDao.findTourWithTourImgWithCityAll(pageMaker.getPageBegin(), pageMaker.getPageEnd(), sortOrder);
 		PageMakerDto<Tour> pageMakerTourList=new PageMakerDto<Tour>(tourList,pageMaker,totTourCount);
 		return pageMakerTourList;
 	}

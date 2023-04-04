@@ -9,9 +9,9 @@ public interface TourDao {
 	int insertTour(Tour tour) throws Exception;
 	//2. 투어상품 수정
 	public int updateTour(Tour tour) throws Exception;
-	//3. 투어상품 리스트 전체 출력 + 페이징 + 정렬 + 페이징
+	//3. 투어상품 리스트 전체 출력 + 정렬 + 페이징
 	//List<Tour> findTourWithTourImgWithCityAll() throws Exception;
-	List<Tour> findTourWithTourImgWithCityAll(int PageStart, int PageEnd, String keyword, int cityNo, int toType, String sortOrder) throws Exception;
+	List<Tour> findTourWithTourImgWithCityAll(int pageStart,int pageEnd,String sortOrder) throws Exception;
 	//4. 투어상품 상품번호로 상세보기
 	Tour findTourWithCityByToNo(int toNo) throws Exception;
 	//5. 상품 지역필터링 + 정렬 + 페이징
