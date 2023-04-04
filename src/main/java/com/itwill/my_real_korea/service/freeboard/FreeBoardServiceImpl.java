@@ -1,4 +1,4 @@
-package com.itwill.my_real_korea.service.freeboard;
+ package com.itwill.my_real_korea.service.freeboard;
 
 import com.itwill.my_real_korea.dao.freeboard.FreeBoardDao;
 import com.itwill.my_real_korea.dto.freeboard.FreeBoard;
