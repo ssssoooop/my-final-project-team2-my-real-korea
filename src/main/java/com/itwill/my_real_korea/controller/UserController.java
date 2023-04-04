@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.itwill.my_real_korea.dto.user.User;
 import com.itwill.my_real_korea.exception.ExistedUserException;
@@ -25,7 +26,7 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
-
+	
 	@ApiOperation(value = "메인페이지")
 	@RequestMapping(value = "/user_main", produces = "application/json;charset=UTF-8")
 	public String user_main() {
@@ -63,29 +64,53 @@ public class UserController {
 	
 	@ApiOperation(value = "로그인 액션")
 	@PostMapping(value = "user_login_action", produces = "application/json;charset=UTF-8")
-	public String user_login_action(@ModelAttribute("fuser") User user,Model model,HttpSession session) throws Exception {
-		String forwardPath = "";
-		try {
-			userService.login(user.getUserId(), user.getPassword());
-			session.setAttribute("sUserId", user.getUserId());
-			forwardPath="redirect:user_main";
-		}catch (UserNotFoundException e) {
-			e.printStackTrace();
-			model.addAttribute("msg1",e.getMessage());
-			forwardPath="user_login_form";
-		}catch (PasswordMismatchException e) {
-			e.printStackTrace();
-			model.addAttribute("msg2",e.getMessage());
-			forwardPath="user_login_form";
-		}
-		return forwardPath;
+	public String user_login_action(@ModelAttribute("fuser") User user, Model model, HttpSession session) throws Exception {
+	    String forwardPath = "";
+	    try {
+	        User loginUser = userService.login(user.getUserId(), user.getPassword());
+	        if (loginUser.getMailAuth() == 0) {
+	        	model.addAttribute("mailKey", loginUser.getMailKey());
+	            forwardPath = "user_auth_form";
+	        } else {
+	            session.setAttribute("sUserId", loginUser.getUserId());
+	            forwardPath = "redirect:user_main";
+	        }
+	    } catch (UserNotFoundException e) {
+	        e.printStackTrace();
+	        model.addAttribute("msg1", e.getMessage());
+	        forwardPath = "user_login_form";
+	    } catch (PasswordMismatchException e) {
+	        e.printStackTrace();
+	        model.addAttribute("msg2", e.getMessage());
+	        forwardPath = "user_login_form";
+	    }
+	    return forwardPath;
 	}
 	
-	@GetMapping(value = "/user_auth_form")
-	public String user_auth_form() {
-		String forward_path = "usr_auth_form";
+	
+	@LoginCheck
+	@ApiOperation(value = "메일 인증 폼")
+	@PostMapping(value = "/user_auth_form")
+	public String user_auth_form(HttpServletRequest request) throws Exception {
+		String forward_path = "";
+		String sUserId=(String)request.getSession().getAttribute("sUserId");
+		User loginUser = userService.findUser(sUserId);
+		request.setAttribute("loginUser", loginUser);
+		forward_path = "user_auth_form";
 		return forward_path;
-		
+	}
+	
+	
+	@PostMapping("/user_auth_action")
+	public String user_auth_action(@ModelAttribute("fuser") User user, 
+			@RequestParam(value = "mailAuthKey", required = true) Integer mailAuthKey, Model model) throws Exception {
+	    int mailKey = (int) model.getAttribute("mailKey");
+	    model.addAttribute("mailKey", mailKey);
+	    if(mailKey == mailAuthKey){
+	        userService.mailAuthUpdate(user);
+	        return "user_main";
+	    }
+	    return "user_auth_form";
 	}
 	
 	

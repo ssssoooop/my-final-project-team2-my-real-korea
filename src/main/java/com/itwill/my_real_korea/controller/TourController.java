@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +21,7 @@ import com.itwill.my_real_korea.util.PageMakerDto;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 
-@Controller
+@RestController
 public class TourController {
 
 	@Autowired
@@ -35,13 +34,13 @@ public class TourController {
 	//1. 투어상품 전체 리스트 보기
 	@ApiOperation(value="투어상품리스트")
 	@RequestMapping(value = "/tourList", produces="application/json;charset=UTF-8")
-	public Map<String, Object> tour_list(@RequestParam int currentPage,@RequestParam String keyword, @RequestParam int cityNo, @RequestParam int toType, @RequestParam String sortOrder){
+	public Map<String, Object> tour_list(@RequestParam int currentPage,@RequestParam String sortOrder){
 		Map<String, Object> resultMap = new HashMap<>();
 		int code = 1;
 		String msg = "성공";
 		PageMakerDto<Tour> data = null;
 		try {
-			data=tourService.findAll(currentPage,keyword, cityNo, toType, sortOrder);
+			data=tourService.findAll(currentPage, sortOrder);
 			code=1;
 			msg="성공";
 		}catch (Exception e) {

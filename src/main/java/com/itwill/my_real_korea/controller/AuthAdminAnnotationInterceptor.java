@@ -39,14 +39,19 @@ public class AuthAdminAnnotationInterceptor implements HandlerInterceptor {
 		HttpSession session = request.getSession();
 		String sUserId = (String) session.getAttribute("sUserId");
 		
-		// sUserId 가 admin 이 아닌 경우 예외처리
+		// 세션에 저장된 요청URL
+		String requestUrl = (String) session.getAttribute("requestUrl");
+		// sUserId 가 admin 이 아니고 요청URL이 존재할 때, 요청 URL로 돌려보냄
 		if (!sUserId.equals("admin")) {
-			 request.setAttribute("message", "관리자만 가능합니다.");
-             request.setAttribute("exception", "IsNotAdminException");
-             request.getRequestDispatcher("/admin").forward(request, response);
-             System.out.println("@AdminCheck 예외처리");
-             return false;
-		}
+			if (requestUrl != null) {
+				session.removeAttribute("requestUrl");
+				response.sendRedirect(requestUrl);
+			} else {
+				// 요청 URL 없을 때 메인으로 이동
+				response.sendRedirect("main");
+			}
+			return false;
+		} 
 
 		// true : 컨트롤러의 uri로 이동
 		return true;
