@@ -1,6 +1,9 @@
 package com.itwill.my_real_korea.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpSession;
 
@@ -15,80 +18,203 @@ import org.springframework.ui.Model;
 
 import com.itwill.my_real_korea.dto.City;
 import com.itwill.my_real_korea.util.PageMakerDto;
+
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+
 import com.itwill.my_real_korea.dto.freeboard.FreeBoard;
 import com.itwill.my_real_korea.dto.freeboard.FreeBoardComment;
 import com.itwill.my_real_korea.service.freeboard.FreeBoardService;
 import com.itwill.my_real_korea.service.freeboard.FreeBoardCommentService;
 
 @Controller
-public class FreeBoardController{
+public class FreeBoardRestController{
     @Autowired
     private FreeBoardService freeBoardService;
     private FreeBoardCommentService freeBoardCommentService;
-        //게시판리스트(rest)
-//        @RequestMapping(value = "/free-board-list-rest")
-//        public Map<String, Object> freeBoard_list_rest(@RequestParam City city, Model model, @RequestParam int pageStart, int pageEnd, HttpSession session) throws Exception{
-//        Map<String,Object> resultMap = new HashMap<>();
-//        PageMakerDto<FreeBoard> freeBoardList = (PageMakerDto<FreeBoard>) 
-//	    String sUserId = (String)session.getAttribute("sUserId");
-//        City sCity=(City)session.getAttribute("sCity");
-//        System.out.println("freeBord_list_rest 컨트롤러 map:"+resultMap);
-//	    freeBoardService.selectAll(pageStart,pageEnd);
-//            model.addAttribute("freeboardList",freeBoardList);
-//            model.addAttribute("pageStart",pageStart);
-//            model.addAttribute("pageEnd",pageEnd);
-//			return sUserId;
-//        }
+        //게시판리스트1-조회수많은순
+    	@ApiOperation("게시판리스트")
+        @GetMapping(value = "/free-board-read-count",produces="application/json;charset=UTF-8")
+        public Map<String, Object> freeBoard_list(@RequestParam(required = false, defaultValue = "1")FreeBoard freeBoard, @RequestParam(required = false, defaultValue = "2")int currentPage, @RequestParam Map<String, Object> resultMap) throws Exception{
+        resultMap=new HashMap<>();
+        int code =1;
+        String msg="성공";
+	    PageMakerDto<FreeBoard> freeBoardList = null;
+	     try {
+	    	 //조회수많은순으로 나열
+	    	 freeBoardList=(PageMakerDto<FreeBoard>) freeBoardService.selectAllOrderByReadCountDesc(currentPage);
+	    	 code=1;
+	    	 msg="성공";
+	     }catch(Exception e) {
+	    	 e.printStackTrace();
+	    	 code=2;
+	    	 msg="관리자에게 문의하세요.";
+	     }
+            resultMap.put("freeboardList",freeBoardList);
+            resultMap.put("code",code);
+            resultMap.put("msg",msg);
+        
+		return resultMap;
+    	}
+    	//게시판리스트2-최신순
+    	@ApiOperation("게시판리스트")
+        @GetMapping(value = "/free-board-date-desc",produces="application/json;charset=UTF-8")
+        public Map<String, Object> freeBoard_list_New(@RequestParam(required = false, defaultValue = "0") FreeBoard freeboard, @RequestParam(required = false, defaultValue = "1") int currentPage, @RequestParam Map<String, Object> resultMap) throws Exception{
+        resultMap=new HashMap<>();
+        int code =1;
+        String msg="성공";
+        
+	     PageMakerDto<FreeBoard> freeBoardList = null;
+	     try {
+	    	 freeBoardList=(PageMakerDto<FreeBoard>) freeBoardService.selectAllOrderByFBoNoDesc(currentPage);
+	    	 code=1;
+	    	 msg="성공";
+	     }catch(Exception e) {
+	    	 e.printStackTrace();
+	    	 code=2;
+	    	 msg="관리자에게 문의하세요.";
+	     }
+	     	resultMap.put("freeBoardList",freeBoardList);
+	     	resultMap.put("code", code);
+	     	resultMap.put("msg", msg);
+		return resultMap;
+    	}
+    	//게시판리스트3-오래된순
+    	@ApiOperation("게시판리스트")
+        @GetMapping(value = "/free-board-date-asc",produces="application/json;charset=UTF-8")
+        public Map<String, Object> freeBoard_list_Old(@RequestParam(required = false, defaultValue = "1") FreeBoard freeboard, @RequestParam(required = false, defaultValue = "2") int currentPage, @RequestParam Map<String, Object> resultMap) throws Exception{
+        resultMap=new HashMap<>();
+        int code =1;
+        String msg="성공";
+        
+	     PageMakerDto<FreeBoard> freeBoardList = null;
+	     try {
+	    	 freeBoardList=(PageMakerDto<FreeBoard>) freeBoardService.selectAllOrderByFBoNoAsc(currentPage);
+	    	 code=1;
+	    	 msg="성공";
+	     }catch(Exception e) {
+	    	 e.printStackTrace();
+	    	 code=2;
+	    	 msg="관리자에게 문의하세요.";
+	     }
+        resultMap.put("code", code);
+        resultMap.put("msg", msg);
+        resultMap.put("freeBoardList", freeBoardList);
+		return resultMap;
+    	}
+    	//타이틀 키워드로 검색
+    	@ApiOperation(value = "게시판 검색")
+    	@ApiImplicitParam(name="keyword", value="키워드")
+    	@GetMapping(value = "/free-board-keyword-search-{keyword}", produces = "application/json;charset=UTF-8")
+    	public Map<String, Object> freeboard_search_list(@RequestParam(required = false, defaultValue = "1") int currentPage, @RequestParam(required = true) String keyword) {
+	    	Map<String, Object> resultMap=new HashMap<>();
+	    	int code = 1;
+	    	String msg = "성공";
+	    	PageMakerDto<FreeBoard> freeboardList = null;
+	    	//리스트에 리스트가 있을때, 페이지값이 있을 때만 성공
+	    	try {
+	    		freeboardList = freeBoardService.selectSearchFreeBoardList(currentPage, keyword);
+	    		if(freeboardList.getTotRecordCount() != 0 && freeboardList != null) {
+	    			code = 1;
+	    			msg = "성공";
+	    		}else {
+	    			//리스트와 페이지값이 없을때 실패
+	    			code = 2;
+	    			msg = "해당 키워드에 해당하는 게시물이 없습니다.";
+	    		}
+	    	}catch (Exception e) {
+	    		// 에러 발생시 code 3
+	    		e.printStackTrace();
+	    		code = 3;
+	    		msg = "관리자에게 문의하세요.";
+			}
+	    	resultMap.put("code", code);
+	    	resultMap.put("msg", msg);
+	    	resultMap.put("freeboardList", freeboardList);
+    		return resultMap;
+    	}
         //게시판 상세보기
-        @RequestMapping(value = "/free-board-view")
-        public String freeBoard_view(@RequestParam int fBoNo,@RequestParam int pageStart, int pageEnd,Model model, HttpSession session, @ModelAttribute FreeBoardComment freeBoardComment ) throws Exception{
-            String forwardPath = "";
-            String sUserId = (String)session.getAttribute("sUserId");
-            City sCity = (City)session.getAttribute("sCity");
+    	@ApiOperation("게시판 상세보기")
+        @RequestMapping(value = "/free-board-detail", produces = "application/json;charset=UTF-8")
+        public Map<String, Object> freeBoard_detail(@RequestParam int fBoNo,@RequestParam Map<String,Object> resultMap) throws Exception{
             FreeBoard freeBoard = freeBoardService.selectByNo(fBoNo);
-            model.addAttribute("freeBoard",freeBoard);
-            model.addAttribute("pageStart",pageStart);
-            model.addAttribute("pageEnd",pageEnd);
-            List<FreeBoardComment> freeBoardCommentList = freeBoardCommentService.selectAll();
-            model.addAttribute("freeBoardCommentList", freeBoardCommentList);
-            System.out.println("freeBoardCommentList"+freeBoardCommentList);
-			return sUserId;
+            resultMap=new HashMap<>();
+            int code = 1;
+            String msg = "성공";
+            List<FreeBoardComment> freeboardCommentList = new ArrayList<FreeBoardComment>();
+            try {
+            freeboardCommentList=freeBoardCommentService.selectAll();
+            code=1;
+            msg="성공";
+            }catch(Exception e) {
+            	e.printStackTrace();
+            	code=2;
+            	msg="관리자에게 문의하세요.";
+            }
+            resultMap.put("freeBoard",freeBoard);
+            resultMap.put("freeBoardCommentList",freeboardCommentList);
+            resultMap.put("code",code);
+            resultMap.put("msg",msg);
+			return resultMap;
         }
-       
+        //게시판 글쓰기
+    	@ApiOperation("게시판 글쓰기")
+        @GetMapping(value = "/free-board-write-form")
+        public String free_board_write_form(HttpSession session) throws Exception {
+            String sUserId = (String)session.getAttribute("sUserId");
+            String forwardPath="";
+            String msg="로그인하세요.";
+                //비회원은 로그인화면으로
+                if(sUserId == null) {
+                	msg="로그인하세요.";
+                    forwardPath = "user-login-form";
+                }
+                //회원은 쓰기 폼으로
+                if(sUserId != null) {
+                    forwardPath = "free-board-write";
+                }
+                return forwardPath;
+        }
         //게시판에 등록
-        @PostMapping("/free-board-write-action-json")
-        public String free_board_write_action(@RequestParam Model model,HttpSession session, @ModelAttribute FreeBoard freeBoard) throws Exception {
-            String sUserId=(String)session.getAttribute("sUserId");
-            String forwardPath = "";
-            //비회원은 로그인화면으로
-            if(sUserId == null) {
-            forwardPath = "user-login-form";
+        @PostMapping("/free-board-write-action")
+        public Map<String, Object> free_board_write_action(@RequestParam int fBoNo, @RequestParam Map<String,Object> resultMap) throws Exception {
+            resultMap=new HashMap<>();
+            int code = 1;
+            String msg="성공";
+            List<FreeBoard> freeBoardList = new ArrayList<FreeBoard>();
+            try {
+            	code = 1;
+            	msg = "성공";
+            }catch(Exception e) {
+            	e.printStackTrace();
+            	code=2;
+            	msg="error";
             }
-            //회원은 게시판리스트로
-            if(sUserId != null) {
-            City sCity=(City)session.getAttribute("sCity");
-            forwardPath = "free-board-list";
-            }
-            return forwardPath;
+            resultMap.put("code", code);
+            resultMap.put("msg", msg);
+            resultMap.put("Data", freeBoardList);
+            
+            return resultMap;
         }
         //게시판에 등록된 글 수정
         @RequestMapping("/free-board-update-form")
-        public String free_board_update_form(@RequestParam Integer pageStart, Integer pageEnd, @RequestParam Integer fBoNo, Model model,HttpSession session) throws Exception{
-            String sUserId = (String)session.getAttribute("sUserId");
-            String userId = (String)session.getAttribute("userId");
-            
-            String forwardPath = "";
-            //비회원은 로그인화면으로
-            if(sUserId == null) {
-            forwardPath = "user-login-form";
+        public Map<String, Object> free_board_modify_action(@RequestParam Integer pageStart, Integer pageEnd, @RequestParam Integer fBoNo, Model model,HttpSession session) throws Exception{
+            Map<String, Object> resultMap=new HashMap<>();
+            int code = 1;
+            String msg = "성공";
+            List<FreeBoard> freeBoardList = new ArrayList<FreeBoard>();
+            try {
+            	FreeBoard freeBoard = freeBoardService.selectByNo(fBoNo);
+            	
+            }catch(Exception e) {
+            	e.printStackTrace();
+            	code = 3;
+            	msg = "관리자에게 문의하세요.";
             }
-            //회원
-            if(sUserId == userId) {
-                FreeBoard freeBoard = freeBoardService.selectByNo(fBoNo);
-                model.addAttribute("freeBoard",freeBoard);
-                forwardPath = "free-board-update";
-            }
-            return forwardPath;
+            resultMap.put("code", code);
+            resultMap.put("msg", msg);
+            resultMap.put("Data", freeBoardList);
+            return resultMap;
         }
         //수정 후 게시
 //        @RequestMapping("/free-board-update-action")

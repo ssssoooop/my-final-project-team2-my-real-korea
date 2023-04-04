@@ -31,10 +31,42 @@ public class FreeBoardController{
     @Autowired
     private FreeBoardService freeBoardService;
     private FreeBoardCommentService freeBoardCommentService;
-        //게시판리스트
+        //게시판리스트1-조회수많은순
     	@ApiOperation("게시판리스트")
-        @GetMapping(value = "/free-board-list", produces = "application/json;charset=UTF-8")
+        @GetMapping(value = "/free-board-read-count")
         public Map<String, Object> freeBoard_list(@RequestParam(required = false, defaultValue = "0") int cityNo, @RequestParam(required = false, defaultValue = "1") int currentPage, Model model, HttpSession session, @RequestParam Map<String, Object> resultMap) throws Exception{
+        String sUserId = (String)session.getAttribute("sUserId");
+        int sCityNo=(Integer)session.getAttribute("sCityNo");
+        resultMap=new HashMap<>();
+        int code =1;
+        String msg="성공";
+        System.out.println("sCityNo:"+sCityNo);
+        
+		//지역있는 질문 리스트일때
+	     if(sCityNo !=0) {
+            resultMap.put("userId", sUserId);
+		  	resultMap.put("city",sCityNo);
+	     }else {}
+	     PageMakerDto<FreeBoard> fList = null;
+	     try {
+	    	 //조회수많은순으로 나열
+	    	 fList=(PageMakerDto<FreeBoard>) freeBoardService.selectAllOrderByReadCountDesc(currentPage);
+	    	 code=1;
+	    	 msg="성공";
+	     }catch(Exception e) {
+	    	 e.printStackTrace();
+	    	 code=2;
+	    	 msg="관리자에 문의하세요.";
+	     }
+            model.addAttribute("freeboardList",fList);
+            model.addAttribute("currentPage",currentPage);
+        
+		return resultMap;
+    	}
+    	//게시판리스트2-최신순
+    	@ApiOperation("게시판리스트")
+        @GetMapping(value = "/free-board-date-asc")
+        public Map<String, Object> freeBoard_list_New(@RequestParam(required = false, defaultValue = "0") int cityNo, @RequestParam(required = false, defaultValue = "1") int currentPage, Model model, HttpSession session, @RequestParam Map<String, Object> resultMap) throws Exception{
         String sUserId = (String)session.getAttribute("sUserId");
         int sCityNo=(Integer)session.getAttribute("sCityNo");
         resultMap=new HashMap<>();
@@ -66,16 +98,26 @@ public class FreeBoardController{
         //게시판 상세보기
     	@ApiOperation("게시판 상세보기")
         @RequestMapping(value = "/free-board-view")
-        public String freeBoard_view(@RequestParam int fBoNo,@RequestParam int pageStart, int pageEnd,Model model, HttpSession session, @ModelAttribute FreeBoardComment freeBoardComment ) throws Exception{
+        public String freeBoard_view(@RequestParam int fBoNo,@RequestParam int pageStart, int pageEnd,Model model, HttpSession session, @ModelAttribute FreeBoardComment freeBoardComment) throws Exception{
             String sUserId = (String)session.getAttribute("sUserId");
             session.getAttribute("sCityNo");
             
             FreeBoard freeBoard = freeBoardService.selectByNo(fBoNo);
+            int code = 1;
+            String msg = "성공";
             model.addAttribute("freeBoard",freeBoard);
             model.addAttribute("pageStart",pageStart);
             model.addAttribute("pageEnd",pageEnd);
             List<FreeBoardComment> freeboardCommentList = new ArrayList<>();
+            try {
             freeboardCommentList=freeBoardCommentService.selectAll();
+            code=1;
+            msg="성공";
+            }catch(Exception e) {
+            	e.printStackTrace();
+            	code=2;
+            	msg="관리자에 문의하세요.";
+            }
             model.addAttribute("freeBoardCommentList", freeboardCommentList);
             System.out.println("freeBoardCommentList"+freeboardCommentList);
 			return sUserId;
@@ -86,8 +128,10 @@ public class FreeBoardController{
         public String free_board_write_form(HttpSession session) throws Exception {
             String sUserId = (String)session.getAttribute("sUserId");
             String forwardPath="";
+            String msg="로그인하세요.";
                 //비회원은 로그인화면으로
                 if(sUserId == null) {
+                	msg="로그인하세요.";
                     forwardPath = "user-login-form";
                 }
                 //회원은 쓰기 폼으로
