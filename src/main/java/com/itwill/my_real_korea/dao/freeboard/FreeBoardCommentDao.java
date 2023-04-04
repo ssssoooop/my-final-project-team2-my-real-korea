@@ -3,7 +3,6 @@ package com.itwill.my_real_korea.dao.freeboard;
 import java.util.List;
 
 import com.itwill.my_real_korea.dto.freeboard.FreeBoardComment;
-import com.itwill.my_real_korea.dto.freeboard.FreeBoardCommentListPageMakerDto;
 
 public interface FreeBoardCommentDao {
 

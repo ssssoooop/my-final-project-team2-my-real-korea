@@ -4,7 +4,6 @@ package com.itwill.my_real_korea.dao.freeboard;
 import java.util.List;
 
 import com.itwill.my_real_korea.dto.freeboard.FreeBoard;
-import com.itwill.my_real_korea.dto.freeboard.FreeBoardListPageMakerDto;
 
 public interface FreeBoardDao {
     int insertBoard(FreeBoard freeBoard) throws Exception;
