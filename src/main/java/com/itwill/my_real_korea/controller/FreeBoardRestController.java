@@ -188,56 +188,56 @@ public class FreeBoardRestController{
             return resultMap;
         }
         //게시판에 등록
-        @PostMapping("/free-board-write-action")
-        public Map<String, Object> free_board_write_action(@RequestParam int fBoNo, @RequestParam Map<String,Object> resultMap) throws Exception {
-            resultMap=new HashMap<>();
-            int code = 1;
-            String msg="성공";
-            List<FreeBoard> freeBoardList = new ArrayList<FreeBoard>();
-            try {
-            	code = 1;
-            	msg = "성공";
-            }catch(Exception e) {
-            	e.printStackTrace();
-            	code=2;
-            	msg="error";
-            }
-            resultMap.put("code", code);
-            resultMap.put("msg", msg);
-            resultMap.put("Data", freeBoardList);
-            
-            return resultMap;
-        }
-        //게시판에 등록된 글 수정
-        @LoginCheck
-        @RequestMapping("/free-board-update-form")
-        public Map<String, Object> free_board_modify_action(@RequestParam Integer pageStart, Integer pageEnd, @RequestParam Integer fBoNo, @RequestBody FreeBoard freeBoard) throws Exception{
-            Map<String, Object> resultMap=new HashMap<>();
-            int code = 1;
-            String msg = "성공";
-            List<FreeBoard> freeBoardList = new ArrayList<FreeBoard>();
-            try {
-            	FreeBoard findFreeBoard = freeBoardService.selectByNo(fBoNo);
-            	if(findFreeBoard!=null) {
-            		freeBoard.setFBoNo(fBoNo);
-            		freeBoardService.updateFreeBoard(freeBoard);
-            		code = 1;
-            		msg = "성공";
-            		freeBoardList.add(freeBoard);
-            	}else {
-            		code = 2;
-            		msg = "수정 실패";
-            	}
-            }catch(Exception e) {
-            	e.printStackTrace();
-            	code = 3;
-            	msg = "관리자에게 문의하세요.";
-            }
-            resultMap.put("code", code);
-            resultMap.put("msg", msg);
-            resultMap.put("Data", freeBoardList);
-            return resultMap;
-        }
+//        @PostMapping("/free-board-write-action", produces = "application/json;charset=UTF-8")
+//        public Map<String, Object> free_board_write_action(@RequestParam int fBoNo, @RequestParam Map<String,Object> resultMap) throws Exception {
+//            resultMap=new HashMap<>();
+//            int code = 1;
+//            String msg="성공";
+//            List<FreeBoard> freeBoardList = new ArrayList<FreeBoard>();
+//            try {
+//            	code = 1;
+//            	msg = "성공";
+//            }catch(Exception e) {
+//            	e.printStackTrace();
+//            	code=2;
+//            	msg="error";
+//            }
+//            resultMap.put("code", code);
+//            resultMap.put("msg", msg);
+//            resultMap.put("Data", freeBoardList);
+//            
+//            return resultMap;
+//        }
+//        //게시판에 등록된 글 수정
+//        @LoginCheck
+//        @RequestMapping("/free-board-update-form", produces = "application/json;charset=UTF-8")
+//        public Map<String, Object> free_board_modify_action(@RequestParam Integer pageStart, Integer pageEnd, @RequestParam Integer fBoNo, @RequestBody FreeBoard freeBoard) throws Exception{
+//            Map<String, Object> resultMap=new HashMap<>();
+//            int code = 1;
+//            String msg = "성공";
+//            List<FreeBoard> freeBoardList = new ArrayList<FreeBoard>();
+//            try {
+//            	FreeBoard findFreeBoard = freeBoardService.selectByNo(fBoNo);
+//            	if(findFreeBoard!=null) {
+//            		freeBoard.setFBoNo(fBoNo);
+//            		freeBoardService.updateFreeBoard(freeBoard);
+//            		code = 1;
+//            		msg = "성공";
+//            		freeBoardList.add(freeBoard);
+//            	}else {
+//            		code = 2;
+//            		msg = "수정 실패";
+//            	}
+//            }catch(Exception e) {
+//            	e.printStackTrace();
+//            	code = 3;
+//            	msg = "관리자에게 문의하세요.";
+//            }
+//            resultMap.put("code", code);
+//            resultMap.put("msg", msg);
+//            resultMap.put("Data", freeBoardList);
+//            return resultMap;
+//        }
 
         //게시물 삭제
         @LoginCheck
