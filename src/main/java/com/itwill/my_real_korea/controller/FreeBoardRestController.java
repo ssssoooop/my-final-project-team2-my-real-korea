@@ -9,9 +9,12 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
@@ -158,22 +161,31 @@ public class FreeBoardRestController{
 			return resultMap;
         }
         //게시판 글쓰기
+    	@LoginCheck
     	@ApiOperation("게시판 글쓰기")
-        @GetMapping(value = "/free-board-write-form")
-        public String free_board_write_form(HttpSession session) throws Exception {
-            String sUserId = (String)session.getAttribute("sUserId");
-            String forwardPath="";
-            String msg="로그인하세요.";
-                //비회원은 로그인화면으로
-                if(sUserId == null) {
-                	msg="로그인하세요.";
-                    forwardPath = "user-login-form";
-                }
-                //회원은 쓰기 폼으로
-                if(sUserId != null) {
-                    forwardPath = "free-board-write";
-                }
-                return forwardPath;
+        @PostMapping(value = "/free-board-write-form", produces = "application/json;charset=UTF-8")
+        public Map<String, Object> free_board_write_form(@RequestBody FreeBoard freeBoard) throws Exception {
+            Map<String, Object> resultMap = new HashMap<>();
+            int code = 1;
+            String msg = "성공";
+            List<FreeBoard> freeBoardList = new ArrayList<FreeBoard>();
+            try {
+            	//성공
+            	freeBoardService.insertBoard(freeBoard);
+            	code = 1;
+            	msg = "성공";
+            	freeBoard = freeBoardService.selectByNo(freeBoard.getFBoNo());
+            	freeBoardList.add(freeBoard);
+            } catch (Exception e) {
+            	//실패
+            	e.printStackTrace();
+            	code = 2;
+            	msg = "글쓰기 실패";
+            }
+            resultMap.put("code", code);
+            resultMap.put("msg", msg);
+            resultMap.put("freeBoardList", freeBoardList);
+            return resultMap;
         }
         //게시판에 등록
         @PostMapping("/free-board-write-action")
@@ -197,15 +209,25 @@ public class FreeBoardRestController{
             return resultMap;
         }
         //게시판에 등록된 글 수정
+        @LoginCheck
         @RequestMapping("/free-board-update-form")
-        public Map<String, Object> free_board_modify_action(@RequestParam Integer pageStart, Integer pageEnd, @RequestParam Integer fBoNo, Model model,HttpSession session) throws Exception{
+        public Map<String, Object> free_board_modify_action(@RequestParam Integer pageStart, Integer pageEnd, @RequestParam Integer fBoNo, @RequestBody FreeBoard freeBoard) throws Exception{
             Map<String, Object> resultMap=new HashMap<>();
             int code = 1;
             String msg = "성공";
             List<FreeBoard> freeBoardList = new ArrayList<FreeBoard>();
             try {
-            	FreeBoard freeBoard = freeBoardService.selectByNo(fBoNo);
-            	
+            	FreeBoard findFreeBoard = freeBoardService.selectByNo(fBoNo);
+            	if(findFreeBoard!=null) {
+            		freeBoard.setFBoNo(fBoNo);
+            		freeBoardService.updateFreeBoard(freeBoard);
+            		code = 1;
+            		msg = "성공";
+            		freeBoardList.add(freeBoard);
+            	}else {
+            		code = 2;
+            		msg = "수정 실패";
+            	}
             }catch(Exception e) {
             	e.printStackTrace();
             	code = 3;
@@ -216,15 +238,37 @@ public class FreeBoardRestController{
             resultMap.put("Data", freeBoardList);
             return resultMap;
         }
-        //수정 후 게시
-//        @RequestMapping("/free-board-update-action")
-//        public String free_board_update_action(@ModelAttribute FreeBoard freeBoard, HttpSession session) throws Exception{
-//            return "redirect:free-board-list";
-//        }
+
         //게시물 삭제
-        @RequestMapping("/free-board-delete-action")
-        public String free_board_delete_action(@ModelAttribute FreeBoard freeBoard, HttpSession session) throws Exception{
-            return "redirect:free-board-list";
+        @LoginCheck
+        @ApiOperation(value = "보드 게시물 삭제")
+        @ApiImplicitParam(name="fBoNo", value = "게시물 번호")
+        @DeleteMapping(value = "/free-board-list/{fBoNo}", produces = "application/json;charset=UTF-8")
+        public Map<String,Object> free_board_delete_action(@PathVariable("fBoNo") int fBoNo){
+            Map<String,Object> resultMap = new HashMap<>();
+            int code = 1;
+            String msg = "성공";
+            List<FreeBoard> freeBoardList = new ArrayList<FreeBoard>();
+            try {
+            	int rowCount = freeBoardService.deleteFreeBoard(fBoNo);
+            	if(rowCount!=0) { 
+            		code =1;
+            		msg = "성공";
+            	}else {
+            			code = 2;
+            			msg = "보드 게시물 삭제 실패";
+            			FreeBoard failFreeBoard = freeBoardService.selectByNo(fBoNo);
+            			freeBoardList.add(failFreeBoard);
+            		}
+            }catch(Exception e) {
+            	e.printStackTrace();
+            	code = 3;
+            	msg = "관리자에게 문의바랍니다.";
+            }
+            resultMap.put("code", code);
+            resultMap.put("msg", msg);
+            resultMap.put("freeBoardList", freeBoardList);
+        	return resultMap;
         }
 }
 
